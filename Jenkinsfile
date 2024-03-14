@@ -1,71 +1,25 @@
 pipeline {
     agent any
     
+    environment {
+        DIRECTORY_PATH = "/path/to/code"
+        TESTING_ENVIRONMENT = "TestingEnv"
+        PRODUCTION_ENVIRONMENT = "YourNameProductionEnv"
+    }
+    
     stages {
         stage('Build') {
             steps {
-                echo 'Installing dependencies...'
-                echo 'Building application...'
-                git branch: 'main', url: 'https://github.com/yourusername/yourrepository'
+                echo "Fetching the source code from the directory path specified by the environment variable: ${env.DIRECTORY_PATH}"
+                echo "Compiling the code and generating any necessary artifacts updated"
             }
         }
         stage('Test') {
             steps {
-                echo 'Running tests...'
-                
-                script {
-                    def powershellScript = """
-                        \$MailServer = "smtp.example.com"
-                        \$MailFrom = "sender@example.com"
-                        \$MailTo = "arsh4765.be22@chitkara.edu.in"
-                        \$MailSubject = "Test Results"
-                        \$MailBody = "Tests executed successfully."
-                        \$MailUsername = "yourusername"
-                        \$MailPassword = ""
-    
-                        Send-MailMessage -From \$MailFrom -To \$MailTo -Subject \$MailSubject -Body \$MailBody -SmtpServer \$MailServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$MailUsername, (ConvertTo-SecureString -AsPlainText \$MailPassword -Force))
-                    """
-                    powershell(powershellScript)
-                }
+                echo "Running unit tests"
+                echo "Running integration tests"
             }
-        }
-        stage('Code Analysis') {
-            steps {
-                echo 'Performing code analysis...'
-            }
-        }
-        stage('Security') {
-            steps {
-                echo 'Running security checks...'
-                
-                script {
-                    def powershellScript = """
-                        \$MailServer = "smtp.example.com"
-                        \$MailFrom = "sender@example.com"
-                        \$MailTo = "arsh4765.be22@chitkara.edu.in"
-                        \$MailSubject = "Security Check Results"
-                        \$MailBody = "Security scans passed."
-                        \$MailUsername = "yourusername"
-                        \$MailPassword = ""
-    
-                        Send-MailMessage -From \$MailFrom -To \$MailTo -Subject \$MailSubject -Body \$MailBody -SmtpServer \$MailServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$MailUsername, (ConvertTo-SecureString -AsPlainText \$MailPassword -Force))
-                    """
-                    powershell(powershellScript)
-                }
-            }
-        }
-        
-        stage('Deploy Staging') {
-            steps {
-                echo 'Deploying to staging environment...'
-            }
-        }
-        
-        stage('Integration Test') {
-            steps {
-                echo 'Running integration tests...'
-            }
-post {
+            post {
                 
                 success {
                     emailext  subject: 'Unit Test Status - Success', 
@@ -81,48 +35,38 @@ post {
                 }
             }
         }
-        
-        stage('Deploy Production') {
+        stage('Code Quality Check') {
             steps {
-                echo 'Deploying to production environment...'
+                echo "Checking the quality of the code"
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo "Deploying the application to a testing environment specified by the environment variable: ${env.TESTING_ENVIRONMENT}"
+            }
+        }
+        stage('Approval') {
+            steps {
+                script {
+                    echo "Pausing for manual approval..."
+                    sleep(time: 10, unit: 'SECONDS')
+                }
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                echo "Deploying the code to the production environment ${env.PRODUCTION_ENVIRONMENT}"
+                 echo "Deploying the code to cfjdsbjvgbgvT"
             }
         }
     }
     
     post {
         success {
-            script {
-                def powershellScript = """
-                    \$MailServer = "smtp.example.com"
-                    \$MailFrom = "sender@example.com"
-                    \$MailTo = "arsh4765.be22@chitkara.edu.in"
-                    \$MailSubject = "Pipeline Success"
-                    \$MailBody = "Pipeline executed successfully."
-                    \$MailUsername = "yourusername"
-                    \$MailPassword = ""
-    
-                    Send-MailMessage -From \$MailFrom -To \$MailTo -Subject \$MailSubject -Body \$MailBody -SmtpServer \$MailServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$MailUsername, (ConvertTo-SecureString -AsPlainText \$MailPassword -Force))
-                """
-                powershell(powershellScript)
-            }
-            echo 'Pipeline executed successfully!'
+            echo 'Pipeline succeeded! Deployed successfully to production.'
         }
         failure {
-            script {
-                def powershellScript = """
-                    \$MailServer = "smtp.example.com"
-                    \$MailFrom = "sender@example.com"
-                    \$MailTo = "arsh4765.be22@chitkara.edu.in"
-                    \$MailSubject = "Pipeline Failure"
-                    \$MailBody = "Pipeline failed to execute."
-                    \$MailUsername = "yourusername"
-                    \$MailPassword = ""
-    
-                    Send-MailMessage -From \$MailFrom -To \$MailTo -Subject \$MailSubject -Body \$MailBody -SmtpServer \$MailServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$MailUsername, (ConvertTo-SecureString -AsPlainText \$MailPassword -Force))
-                """
-                powershell(powershellScript)
-            }
-            echo 'Pipeline execution failed! Please check for errors.'
+            echo 'Pipeline failed. Deployment to production unsuccessful.'
         }
     }
 }
