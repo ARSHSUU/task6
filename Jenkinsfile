@@ -1,25 +1,79 @@
 pipeline {
     agent any
     
-    environment {
-        DIRECTORY_PATH = "/path/to/code"
-        TESTING_ENVIRONMENT = "TestingEnv"
-        PRODUCTION_ENVIRONMENT = "YourNameProductionEnv"
-    }
-    
     stages {
         stage('Build') {
             steps {
-                echo "Fetching the source code from the directory path specified by the environment variable: ${env.DIRECTORY_PATH}"
-                echo "Compiling the code and generating any necessary artifacts updated"
+                echo 'Dependency installation...'
+                echo 'Building application...'
+                git branch: 'main', url: 'https://github.com/ARSHSUU/task6'
             }
         }
         stage('Test') {
             steps {
-                echo "Running unit tests"
-                echo "Running integration tests"
+                echo 'Testing...'
+                
+                script {
+                    def powershellCommand = """
+                        \$SMTPServer = "smtp.gmail.com"
+                        \$SMTPFrom = "example@gmail.com"
+                        \$SMTPTo = "example@gmail.com"
+                        \$SMTPSubject = "Test success."
+                        \$SMTPBody = "Test successful."
+                        \$SMTPUsername = "example@gmail.com"
+                        \$SMTPPassword = ""
+    
+                        Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
+                    """
+                    powershell(powershellCommand)
+                }
             }
-            post {
+        }
+        stage('Code Analysis') {
+            steps {
+                echo 'Code analysis...'
+            }
+        }
+        stage('Security') {
+            steps {
+                echo 'Security scans...'
+                
+                script {
+                    def powershellCommand = """
+                        \$SMTPServer = "smtp.gmail.com"
+                        \$SMTPFrom = "example@gmail.com"
+                        \$SMTPTo = "example@gmail.com"
+                        \$SMTPSubject = "Security checks passed."
+                        \$SMTPBody = "Pipeline cleared security checks."
+                        \$SMTPUsername = "example@gmail.com"
+                        \$SMTPPassword = ""
+    
+                        Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
+                    """
+                    powershell(powershellCommand)
+                }
+            }
+        }
+        
+        stage('Deploy Staging') {
+            steps {
+                echo 'Staging deployment...'
+            }
+        }
+        
+        stage('Integration Test') {
+            steps {
+                echo 'Integration testing...'
+            }
+        }
+        
+        stage('Deploy Production') {
+            steps {
+                echo 'Production deployment...'
+            }
+        }
+    }
+    post {
                 
                 success {
                     emailext  subject: 'Unit Test Status - Success', 
@@ -34,39 +88,40 @@ pipeline {
                               attachLog: true
                 }
             }
-        }
-        stage('Code Quality Check') {
-            steps {
-                echo "Checking the quality of the code"
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo "Deploying the application to a testing environment specified by the environment variable: ${env.TESTING_ENVIRONMENT}"
-            }
-        }
-        stage('Approval') {
-            steps {
-                script {
-                    echo "Pausing for manual approval..."
-                    sleep(time: 10, unit: 'SECONDS')
-                }
-            }
-        }
-        stage('Deploy to Production') {
-            steps {
-                echo "Deploying the code to the production environment ${env.PRODUCTION_ENVIRONMENT}"
-                 echo "Deploying the code to cfjdsbjvgbgvT"
-            }
-        }
-    }
-    
     post {
         success {
-            echo 'Pipeline succeeded! Deployed successfully to production.'
+            script {
+                def powershellCommand = """
+                    \$SMTPServer = "smtp.gmail.com"
+                    \$SMTPFrom = "example@gmail.com"
+                    \$SMTPTo = "example@gmail.com"
+                    \$SMTPSubject = "Success."
+                    \$SMTPBody = "Pipeline executed successfully."
+                    \$SMTPUsername = "example@gmail.com"
+                    \$SMTPPassword = ""
+    
+                    Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
+                """
+                powershell(powershellCommand)
+            }
+            echo 'Success!'
         }
         failure {
-            echo 'Pipeline failed. Deployment to production unsuccessful.'
+            script {
+                def powershellCommand = """
+                    \$SMTPServer = "smtp.gmail.com"
+                    \$SMTPFrom = "example@gmail.com"
+                    \$SMTPTo = "example@gmail.com"
+                    \$SMTPSubject = "Failure"
+                    \$SMTPBody = "Pipeline failed to execute."
+                    \$SMTPUsername = "example@gmail.com"
+                    \$SMTPPassword = ""
+    
+                    Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
+                """
+                powershell(powershellCommand)
+            }
+            echo 'Failure! Check for errors.'
         }
     }
 }
