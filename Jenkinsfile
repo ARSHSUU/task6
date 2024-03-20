@@ -4,124 +4,59 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Dependency installation...'
-                echo 'Building application...'
-                git branch: 'main', url: 'https://github.com/ARSHSUU/task6'
+                echo 'Building the code using Maven...'
             }
         }
-        stage('Test') {
+        
+        stage('Unit and Integration Tests') {
             steps {
-                echo 'Testing...'
-                
-                script {
-                    def powershellCommand = """
-                        \$SMTPServer = "smtp.gmail.com"
-                        \$SMTPFrom = "example@gmail.com"
-                        \$SMTPTo = "example@gmail.com"
-                        \$SMTPSubject = "Test success."
-                        \$SMTPBody = "Test successful."
-                        \$SMTPUsername = "example@gmail.com"
-                        \$SMTPPassword = ""
-    
-                        Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
-                    """
-                    powershell(powershellCommand)
-                }
+                echo 'Running unit tests...'
+                echo 'Running integration tests...'
             }
         }
+        
         stage('Code Analysis') {
             steps {
-                echo 'Code analysis...'
-            }
-        }
-        stage('Security') {
-            steps {
-                echo 'Security scans...'
-                
-                script {
-                    def powershellCommand = """
-                        \$SMTPServer = "smtp.gmail.com"
-                        \$SMTPFrom = "example@gmail.com"
-                        \$SMTPTo = "example@gmail.com"
-                        \$SMTPSubject = "Security checks passed."
-                        \$SMTPBody = "Pipeline cleared security checks."
-                        \$SMTPUsername = "example@gmail.com"
-                        \$SMTPPassword = ""
-    
-                        Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
-                    """
-                    powershell(powershellCommand)
-                }
+                echo 'Running code analysis using SonarQube...'
             }
         }
         
-        stage('Deploy Staging') {
+        stage('Security Scan') {
             steps {
-                echo 'Staging deployment...'
+                echo 'Performing security scan using OWASP ZAP...'
             }
         }
         
-        stage('Integration Test') {
+        stage('Deploy to Staging') {
             steps {
-                echo 'Integration testing...'
+                echo 'Deploying the application to staging server (e.g., AWS EC2 instance)...'
             }
         }
         
-        stage('Deploy Production') {
+        stage('Integration Tests on Staging') {
             steps {
-                echo 'Production deployment...'
+                echo 'Running integration tests on staging environment...'
+            }
+        }
+        
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying the application to production server (e.g., AWS EC2 instance)...'
             }
         }
     }
     post {
-                
-                success {
-                    emailext  subject: 'Unit Test Status - Success', 
-                              body: 'Unit Test has been completed successfully.', 
-                              to: "arsh4765.be22@chitkara.edu.in",
-                              attachLog: true
-                }
-                failure {
-                    emailext subject: 'Unit Test Status - Failure', 
-                              body: 'Unit Test has failed.', 
-                             to: "arsh4765.be22@chitkara.edu.in",
-                              attachLog: true
-                }
-            }
-    post {
         success {
-            script {
-                def powershellCommand = """
-                    \$SMTPServer = "smtp.gmail.com"
-                    \$SMTPFrom = "example@gmail.com"
-                    \$SMTPTo = "example@gmail.com"
-                    \$SMTPSubject = "Success."
-                    \$SMTPBody = "Pipeline executed successfully."
-                    \$SMTPUsername = "example@gmail.com"
-                    \$SMTPPassword = ""
-    
-                    Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
-                """
-                powershell(powershellCommand)
-            }
-            echo 'Success!'
+            emailext subject: "Pipeline '${currentBuild.fullDisplayName}' Successful",
+                      body: 'The build was successful. Congratulations!',
+                      to: 'ak5559338@gmail.com',
+                      attachLog: true
         }
         failure {
-            script {
-                def powershellCommand = """
-                    \$SMTPServer = "smtp.gmail.com"
-                    \$SMTPFrom = "example@gmail.com"
-                    \$SMTPTo = "example@gmail.com"
-                    \$SMTPSubject = "Failure"
-                    \$SMTPBody = "Pipeline failed to execute."
-                    \$SMTPUsername = "example@gmail.com"
-                    \$SMTPPassword = ""
-    
-                    Send-MailMessage -From \$SMTPFrom -to \$SMTPTo -Subject \$SMTPSubject -Body \$SMTPBody -SmtpServer \$SMTPServer -UseSsl -Port 587 -Credential (New-Object System.Management.Automation.PSCredential \$SMTPUsername, (ConvertTo-SecureString -AsPlainText \$SMTPPassword -Force))
-                """
-                powershell(powershellCommand)
-            }
-            echo 'Failure! Check for errors.'
+            emailext subject: "Pipeline '${currentBuild.fullDisplayName}' Failed",
+                      body: 'The build has failed. Please investigate.',
+                      to: 'ak5559338@gmail.com',
+                      attachLog: true
         }
     }
 }
