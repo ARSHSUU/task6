@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building the code using Maven...'
+                echo 'Performing build using Maven...'
             }
         }
         
@@ -15,21 +15,21 @@ pipeline {
             }
         }
         
-        stage('Code Analysis') {
+        stage('Code Quality Check') {
             steps {
-                echo 'Running code analysis using SonarQube...'
+                echo 'Analyzing code quality with SonarQube...'
             }
         }
         
-        stage('Security Scan') {
+        stage('Security Assessment') {
             steps {
-                echo 'Performing security scan using OWASP ZAP...'
+                echo 'Conducting security assessment using OWASP ZAP...'
             }
         }
         
         stage('Deploy to Staging') {
             steps {
-                echo 'Deploying the application to staging server (e.g., AWS EC2 instance)...'
+                echo 'Deploying to staging server (e.g., AWS EC2 instance)...'
             }
         }
         
@@ -41,22 +41,23 @@ pipeline {
         
         stage('Deploy to Production') {
             steps {
-                echo 'Deploying the application to production server (e.g., AWS EC2 instance)...'
+                echo 'Deploying to production server (e.g., AWS EC2 instance)...'
             }
         }
     }
     post {
         success {
-            emailext subject: "Pipeline '${currentBuild.fullDisplayName}' Successful",
-                      body: 'The build was successful. Congratulations!',
-                      to: 'ak5559338@gmail.com',
+            emailext subject: "Pipeline Success: '${currentBuild.fullDisplayName}'",
+                      body: 'The pipeline completed successfully.',
+                      to: 'arsh4765.be22@chitkara.edu.in',
                       attachLog: true
         }
         failure {
-            emailext subject: "Pipeline '${currentBuild.fullDisplayName}' Failed",
-                      body: 'The build has failed. Please investigate.',
-                      to: 'ak5559338@gmail.com',
+            emailext subject: "Pipeline Failure: '${currentBuild.fullDisplayName}'",
+                      body: 'The pipeline encountered a failure. Please investigate.',
+                      to: 'arsh4765.be22@chitkara.edu.in',
                       attachLog: true
         }
     }
 }
+
